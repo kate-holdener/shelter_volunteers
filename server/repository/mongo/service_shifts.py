@@ -120,6 +120,22 @@ class ServiceShiftsMongoRepo:
             shift.set_id(str(shift.get_id()))
         return service_shifts
 
+    def delete_service_shift(self, shift_id):
+        """
+        Deletes a service shift by ID.
+
+        Args:
+            shift_id (str): The ID of the shift to delete.
+
+        Returns:
+            bool: True if deleted, False if not found.
+        """
+        try:
+            result = self.collection.delete_one({"_id": ObjectId(shift_id)})
+        except (InvalidId, TypeError):
+            return False
+        return result.deleted_count > 0
+
     def get_shifts(self, shift_ids):
         """
         Gets multiple shifts by a list of IDs.

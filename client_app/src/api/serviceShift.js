@@ -36,4 +36,10 @@ export const serviceShiftAPI = {
       method: "GET",
     });
   },
+  deleteShift: async (shelterId, shiftId) => {
+    const response = await fetchClient(`/shelters/${shelterId}/service_shifts/${shiftId}`, {
+      method: "DELETE",
+    });
+    return response;
+  },
 };

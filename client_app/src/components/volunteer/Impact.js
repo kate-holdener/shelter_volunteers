@@ -27,6 +27,7 @@ const calculateUniqueShelters = (shifts) => {
 
 function Impact() {
   const [impactData, setImpactData] = useState({ totalHours: 0, sheltersServed: 0 });
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     serviceCommitmentAPI.getPastCommitments()
@@ -37,12 +38,16 @@ function Impact() {
           sheltersServed: calculateUniqueShelters(completed),
         });
       })
-      .catch((e) => console.error("Error fetching past shifts:", e));
+      .catch((e) => {
+        console.error("Error fetching past shifts:", e);
+        setError("Failed to load your impact data. Please try again later.");
+      });
   }, []);
 
   return (
     <div className="impact-container">
       <h1 className="impact-title">Your Impact</h1>
+      {error && <div className="message error">{error}</div>}
       <div className="impact-metrics">
         <div className="metric-card">
           <div className="metric-icon">

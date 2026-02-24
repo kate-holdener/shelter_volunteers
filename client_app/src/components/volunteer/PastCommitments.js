@@ -20,6 +20,7 @@ function compareDates(timestamp1, timestamp2) {
 
 function PastCommitments() {
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [shifts, setShifts] = useState([]);
 
   useEffect(() => {
@@ -32,6 +33,7 @@ function PastCommitments() {
         setShifts(sortedCommitments);
         setLoading(false);
       } catch (error) {
+        setError("Failed to load your past shifts. Please try again later.");
         setLoading(false);
       }
     };
@@ -61,6 +63,9 @@ function PastCommitments() {
 
   if (loading) {
     return <Loading />;
+  }
+  if (error) {
+    return <div className="message error">{error}</div>;
   }
   return (
     <div>

@@ -20,20 +20,28 @@ function ShelterScheduleManager() {
   useEffect(() => {
     // Fetch existing shifts when the component mounts
     const fetchShifts = async () => {
-      const shifts = await scheduleAPI.getShifts(shelterId);
-      if (!shifts || shifts.length === 0) {
-        setNoSchedule(true);
-      } else {
-        setShiftTemplates(shifts);
-        const existingShifts = await serviceShiftAPI.getFutureShiftsForShelter(shelterId);
-        const openDatesSet = new Set(
-          existingShifts.map((shift) => {
-            const date = new Date(shift.shift_start);
-            date.setHours(0, 0, 0, 0);
-            return date.toISOString().split("T")[0];
-          }),
-        );
-        setOpenDates(openDatesSet);
+      try {
+        const shifts = await scheduleAPI.getShifts(shelterId);
+        if (!shifts || shifts.length === 0) {
+          setNoSchedule(true);
+        } else {
+          setShiftTemplates(shifts);
+          const existingShifts = await serviceShiftAPI.getFutureShiftsForShelter(shelterId);
+          const openDatesSet = new Set(
+            existingShifts.map((shift) => {
+              const date = new Date(shift.shift_start);
+              date.setHours(0, 0, 0, 0);
+              return date.toISOString().split("T")[0];
+            }),
+          );
+          setOpenDates(openDatesSet);
+        }
+      } catch (error) {
+        console.error("Error fetching shifts:", error);
+        setSubmitMessage({
+          type: "error",
+          text: "Failed to load schedule data. Please refresh the page and try again.",
+        });
       }
       setIsLoading(false);
     };

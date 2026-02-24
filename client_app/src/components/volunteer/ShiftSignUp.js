@@ -13,6 +13,8 @@ import Loading from '../Loading';
 
 function VolunteerShiftSignup(){
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(null);
+  const [submitError, setSubmitError] = useState(null);
   const [showResults, setShowResults] = useState(false);
   const [results, setResults] = useState([]);
   const [resultShifts, setResultShifts] = useState([]);
@@ -35,6 +37,7 @@ function VolunteerShiftSignup(){
         setLoading(false);
       } catch (error) {
         console.error("fetch error:", error);
+        setFetchError("Failed to load shifts. Please try again later.");
         setLoading(false);
       }
     };
@@ -181,11 +184,13 @@ function VolunteerShiftSignup(){
       setResults(response);
       setResultShifts(sortedShifts.filter(shift => selectedShifts.has(shift._id)));
       setShowResults(true);
+      setSubmitError(null);
       // Reset form
       setSelectedShifts(new Set());
     }
     catch (error) {
       console.error("Error submitting shifts:", error);
+      setSubmitError("Failed to sign up for shifts. Please try again.");
     } 
   };
 
@@ -219,9 +224,13 @@ function VolunteerShiftSignup(){
   if (loading) {
     return <Loading />;
   }
+  if (fetchError) {
+    return <div className="message error">{fetchError}</div>;
+  }
   return (
     <div className="has-sticky-bottom">
       <h1 className="title-small">Volunteer Shift Sign-up</h1>
+      {submitError && <div className="message error">{submitError}</div>}
       <div className="controls-section">
         {/* Sort Controls */}
         <div className="sort-section">

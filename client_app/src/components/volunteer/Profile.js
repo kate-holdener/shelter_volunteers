@@ -76,6 +76,11 @@ const ProfileSettings = () => {
       setProfileData(data);
       setIsLoadingInitialData(false);
       setIsEditing(data.firstName === "" || data.lastName === "" || data.phone === "");
+    }).catch((error) => {
+      if (cancelled) return;
+      console.error("Error fetching profile:", error);
+      setIsLoadingInitialData(false);
+      setMessage("Failed to load your profile. Please refresh the page and try again.");
     });
 
     return () => {

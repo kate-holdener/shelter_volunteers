@@ -7,6 +7,7 @@ import { DesktopShiftRow } from './DesktopShiftRow';
 import { SubmitResultsMessage } from './SubmitResultsMessage';
 import VolunteerShiftCalendar from './VolunteerShiftCalendar';
 import Loading from '../Loading';
+import ServerError from '../ServerError';
 import '../../styles/volunteer/CommitmentsViewToggle.css';
 
 const VIEW_LIST = 'list';
@@ -14,6 +15,7 @@ const VIEW_CALENDAR = 'calendar';
 
 function Commitments(){
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [results, setResults] = useState([]);
   const [shifts, setShifts] = useState([]);
   const [selectedShifts, setSelectedShifts] = useState(new Set());
@@ -28,6 +30,7 @@ function Commitments(){
         setLoading(false);
       } catch (error) {
         console.error("fetch error:", error);
+        setError(true);
         setLoading(false);
       }
     };
@@ -122,6 +125,9 @@ function Commitments(){
 
   if (loading) {
     return <Loading />;
+  }
+  if (error) {
+    return <ServerError />;
   }
 
   const hasShifts = shifts.length > 0;

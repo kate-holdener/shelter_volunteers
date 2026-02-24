@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from "react";
 import { Pencil, Save, X, Lock } from "lucide-react";
 import "../../styles/volunteer/Profile.css";
 import { getUserProfile, postUserProfile } from "../../api/volunteerApi";
+import ServerError from "../ServerError";
 
 const mockAuthUser = {
   email: "volunteer.volunteer@gmail.com",
@@ -62,6 +63,7 @@ const ProfileSettings = () => {
   // Start in editing mode immediately if any REQUIRED fields are uninitialized.
   const [isLoadingInitialData, setIsLoadingInitialData] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [error, setError] = useState(false);
   const [message, setMessage] = useState("");
   const [validationErrors, setValidationErrors] = useState({});
   const [isPosting, setIsPosting] = useState(false);
@@ -76,6 +78,11 @@ const ProfileSettings = () => {
       setProfileData(data);
       setIsLoadingInitialData(false);
       setIsEditing(data.firstName === "" || data.lastName === "" || data.phone === "");
+    }).catch((e) => {
+      if (cancelled) return;
+      console.error("Error fetching profile:", e);
+      setError(true);
+      setIsLoadingInitialData(false);
     });
 
     return () => {
@@ -195,6 +202,10 @@ const ProfileSettings = () => {
   // --- UPDATED SKILLS EXAMPLE STRING ---
   const skillsExamples =
     "First aid/CPR, Narcan (naloxone), De-escalation/conflict resolution, Trauma-informed care, Mental health first aid";
+
+  if (error) {
+    return <ServerError />;
+  }
 
   return (
     <div className="profile-container">

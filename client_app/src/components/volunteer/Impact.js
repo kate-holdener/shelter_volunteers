@@ -3,6 +3,7 @@ import { serviceCommitmentAPI } from "../../api/serviceCommitment";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClock, faSearch } from '@fortawesome/free-solid-svg-icons';
 import "../../styles/volunteer/Impact.css";
+import ServerError from "../ServerError";
 
 const onlyCompleted = (s) => {
   if (!s?.shift_end || !s?.shift_start) return false;
@@ -27,6 +28,7 @@ const calculateUniqueShelters = (shifts) => {
 
 function Impact() {
   const [impactData, setImpactData] = useState({ totalHours: 0, sheltersServed: 0 });
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     serviceCommitmentAPI.getPastCommitments()
@@ -37,8 +39,15 @@ function Impact() {
           sheltersServed: calculateUniqueShelters(completed),
         });
       })
-      .catch((e) => console.error("Error fetching past shifts:", e));
+      .catch((e) => {
+        console.error("Error fetching past shifts:", e);
+        setError(true);
+      });
   }, []);
+
+  if (error) {
+    return <ServerError />;
+  }
 
   return (
     <div className="impact-container">

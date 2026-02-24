@@ -9,10 +9,12 @@ import SignUpResults from './SignUpResults';
 import { MobileShiftCard } from './MobileShiftCard';
 import { DesktopShiftRow } from './DesktopShiftRow';
 import Loading from '../Loading';
+import ServerError from '../ServerError';
 
 
 function VolunteerShiftSignup(){
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [results, setResults] = useState([]);
   const [resultShifts, setResultShifts] = useState([]);
@@ -35,6 +37,7 @@ function VolunteerShiftSignup(){
         setLoading(false);
       } catch (error) {
         console.error("fetch error:", error);
+        setError(true);
         setLoading(false);
       }
     };
@@ -218,6 +221,9 @@ function VolunteerShiftSignup(){
 
   if (loading) {
     return <Loading />;
+  }
+  if (error) {
+    return <ServerError />;
   }
   return (
     <div className="has-sticky-bottom">

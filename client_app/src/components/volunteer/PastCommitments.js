@@ -5,6 +5,7 @@ import { formatTime } from "../../formatting/FormatDateTime";
 import { MobileShiftCard } from "./MobileShiftCard";
 import { DesktopShiftRow } from "./DesktopShiftRow";
 import Loading from "../Loading";
+import ServerError from "../ServerError";
 
 function compareDates(timestamp1, timestamp2) {
   const dateA = new Date(timestamp1).setHours(0, 0, 0, 0);
@@ -20,6 +21,7 @@ function compareDates(timestamp1, timestamp2) {
 
 function PastCommitments() {
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [shifts, setShifts] = useState([]);
 
   useEffect(() => {
@@ -32,6 +34,7 @@ function PastCommitments() {
         setShifts(sortedCommitments);
         setLoading(false);
       } catch (error) {
+        setError(true);
         setLoading(false);
       }
     };
@@ -61,6 +64,9 @@ function PastCommitments() {
 
   if (loading) {
     return <Loading />;
+  }
+  if (error) {
+    return <ServerError />;
   }
   return (
     <div>

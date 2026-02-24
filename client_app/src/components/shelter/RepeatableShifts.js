@@ -5,6 +5,7 @@ import { scheduleAPI } from "../../api/schedule";
 import { DesktopShiftRow } from "./DesktopShiftRow";
 import { timeStringToMillis } from "../../formatting/FormatDateTime";
 import { shelterAPI } from "../../api/shelter";
+import ServerError from "../ServerError";
 const RepeatableShifts = () => {
   const { shelterId } = useParams(); // grab the shelterId from URL
 
@@ -17,6 +18,7 @@ const RepeatableShifts = () => {
     maxVolunteers: 5,
   });
   const [successMessage, setSuccessMessage] = useState("");
+  const [error, setError] = useState(false);
   const [loadingShelterInfo, setLoadingShelterInfo] = useState(false);
   const [shelterInfo, setShelterInfo] = useState(null);
 
@@ -30,6 +32,10 @@ const RepeatableShifts = () => {
     setLoadingShelterInfo(true);
     shelterAPI.getShelter(shelterId).then((shelter) => {
       setShelterInfo(shelter);
+      setLoadingShelterInfo(false);
+    }).catch((e) => {
+      console.error("Error fetching shelter:", e);
+      setError(true);
       setLoadingShelterInfo(false);
     });
 
@@ -99,6 +105,7 @@ const RepeatableShifts = () => {
   };
 
   return (
+    error ? <ServerError /> : (
     <div className="repeatable-shifts-page">
       <h2>Define Repeatable Shifts for Shelter {shelterNameLabel}</h2>
       <p className="instructions">
@@ -196,6 +203,7 @@ const RepeatableShifts = () => {
         {successMessage && <p className="success-message">{successMessage}</p>}
       </div>
     </div>
+    )
   );
 };
 

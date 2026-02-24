@@ -11,12 +11,18 @@ function getMassEmailSubject(shift) {
 const ShiftUserInfoDisplay = ({ shift, onDismiss, isOpen }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [userInfos, setUserInfos] = useState([]);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     if (!shift || !shift._id) return;
     setIsLoading(true);
+    setError(false);
     serviceShiftAPI.getUserInfosInShift(shift._id).then((infos) => {
       setUserInfos(infos);
+      setIsLoading(false);
+    }).catch((e) => {
+      console.error("Error fetching user infos:", e);
+      setError(true);
       setIsLoading(false);
     });
   }, [shift]);
@@ -58,6 +64,8 @@ const ShiftUserInfoDisplay = ({ shift, onDismiss, isOpen }) => {
             </div>
             {isLoading ? (
               <p>Loading...</p>
+            ) : error ? (
+              <p className="text-danger">Unable to load volunteer info. Please try again.</p>
             ) : (
               <table className={"table mx-6 my-2"}>
                 <thead>

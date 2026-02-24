@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { GoogleLogin } from '@react-oauth/google';
 import { loginAPI } from '../../api/login';
 import "../../styles/Login.css";
@@ -6,7 +7,9 @@ import {useAuth } from "../../contexts/AuthContext";
 
 function Login() {
   const { login } = useAuth();
+  const [loginError, setLoginError] = useState(false);
   const onSuccess = (credentialResponse) => {
+    setLoginError(false);
     const decoded = jwtDecode(credentialResponse.credential);
     const user = {
       name: decoded.name || decoded.given_name || decoded.email,
@@ -19,6 +22,7 @@ function Login() {
       })
       .catch(error => {
         console.error('API Error:', error);
+        setLoginError(true);
       });
   };
     
@@ -45,6 +49,11 @@ function Login() {
               size="large"
             />
           </div>
+          {loginError && (
+            <p className="text-danger" style={{ fontSize: '0.875rem', marginTop: '0.5rem' }}>
+              Unable to connect to the server. Please try again.
+            </p>
+          )}
           <p className="tagline-small">
             Sign in to get started with your personalized experience
           </p>

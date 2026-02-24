@@ -4,6 +4,7 @@ import { loginAPI } from '../../api/login';
 import "../../styles/Login.css";
 import { jwtDecode } from "jwt-decode";
 import {useAuth } from "../../contexts/AuthContext";
+import ServerError from "../ServerError";
 
 function Login() {
   const { login } = useAuth();
@@ -29,6 +30,8 @@ function Login() {
     const onError = () => {
       console.log('Login Failed');
     };
+
+    if (loginError) return <ServerError />;
   
     return (
       <div className="home-container">
@@ -49,11 +52,6 @@ function Login() {
               size="large"
             />
           </div>
-          {loginError && (
-            <p className="text-danger" style={{ fontSize: '0.875rem', marginTop: '0.5rem' }}>
-              Unable to connect to the server. Please try again.
-            </p>
-          )}
           <p className="tagline-small">
             Sign in to get started with your personalized experience
           </p>

@@ -104,8 +104,9 @@ const RepeatableShifts = () => {
     setShifts(updatedShifts);
   };
 
+  if (error) return <ServerError />;
+
   return (
-    error ? <ServerError /> : (
     <div className="repeatable-shifts-page">
       <h2>Define Repeatable Shifts for Shelter {shelterNameLabel}</h2>
       <p className="instructions">
@@ -203,7 +204,6 @@ const RepeatableShifts = () => {
         {successMessage && <p className="success-message">{successMessage}</p>}
       </div>
     </div>
-    )
   );
 };
 

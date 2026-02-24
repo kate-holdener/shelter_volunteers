@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { serviceShiftAPI } from "../../api/serviceShift";
+import ServerError from "../ServerError";
 
 function getMassEmailSubject(shift) {
   const start = new Date(shift.shift_start);
@@ -30,6 +31,8 @@ const ShiftUserInfoDisplay = ({ shift, onDismiss, isOpen }) => {
   if (!shift) {
     return null;
   }
+
+  if (error) return <ServerError />;
 
   const massEmailBccEncoded = encodeURIComponent(userInfos.map((x) => x.email).join(","));
   const massEmailSubjectEncoded = encodeURIComponent(getMassEmailSubject(shift));
@@ -64,8 +67,6 @@ const ShiftUserInfoDisplay = ({ shift, onDismiss, isOpen }) => {
             </div>
             {isLoading ? (
               <p>Loading...</p>
-            ) : error ? (
-              <p className="text-danger">Unable to load volunteer info. Please try again.</p>
             ) : (
               <table className={"table mx-6 my-2"}>
                 <thead>

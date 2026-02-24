@@ -277,6 +277,90 @@ class TestServiceShiftAPI(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(data["message"], "Invalid data provided")
 
+    @patch("application.rest.service_shifts.service_shifts_repo")
+    @patch("application.rest.shelter_admin_permission_required.is_authorized")
+    def test_delete_service_shift_success(self, mock_is_authorized, mock_service_shifts_repo):
+        mock_is_authorized.return_value = True
+        existing_shift = ServiceShift(
+            shelter_id="12345",
+            shift_start=10,
+            shift_end=20,
+            required_volunteer_count=1,
+            _id="abc123",
+        )
+        mock_service_shifts_repo.get_shift.return_value = existing_shift
+        mock_service_shifts_repo.delete_service_shift.return_value = True
+
+        response = self.client.delete(
+            "/shelters/12345/service_shifts/abc123",
+            headers=self.headers,
+        )
+
+        data = json.loads(response.data.decode("utf-8"))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data["message"], "Service shift deleted successfully")
+        mock_service_shifts_repo.delete_service_shift.assert_called_once_with("abc123")
+
+    @patch("application.rest.service_shifts.service_shifts_repo")
+    @patch("application.rest.shelter_admin_permission_required.is_authorized")
+    def test_delete_service_shift_not_found(self, mock_is_authorized, mock_service_shifts_repo):
+        mock_is_authorized.return_value = True
+        mock_service_shifts_repo.get_shift.return_value = None
+
+        response = self.client.delete(
+            "/shelters/12345/service_shifts/nonexistent",
+            headers=self.headers,
+        )
+
+        data = json.loads(response.data.decode("utf-8"))
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(data["message"], "Service shift not found")
+
+    @patch("application.rest.service_shifts.service_shifts_repo")
+    @patch("application.rest.shelter_admin_permission_required.is_authorized")
+    def test_delete_service_shift_wrong_shelter(self, mock_is_authorized, mock_service_shifts_repo):
+        mock_is_authorized.return_value = True
+        existing_shift = ServiceShift(
+            shelter_id="99999",
+            shift_start=10,
+            shift_end=20,
+            required_volunteer_count=1,
+            _id="abc123",
+        )
+        mock_service_shifts_repo.get_shift.return_value = existing_shift
+
+        response = self.client.delete(
+            "/shelters/12345/service_shifts/abc123",
+            headers=self.headers,
+        )
+
+        data = json.loads(response.data.decode("utf-8"))
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(data["message"], "shelter_id in URL does not match shift shelter")
+
+    @patch("application.rest.service_shifts.service_shifts_repo")
+    @patch("application.rest.shelter_admin_permission_required.is_authorized")
+    def test_delete_service_shift_db_failure(self, mock_is_authorized, mock_service_shifts_repo):
+        mock_is_authorized.return_value = True
+        existing_shift = ServiceShift(
+            shelter_id="12345",
+            shift_start=10,
+            shift_end=20,
+            required_volunteer_count=1,
+            _id="abc123",
+        )
+        mock_service_shifts_repo.get_shift.return_value = existing_shift
+        mock_service_shifts_repo.delete_service_shift.return_value = False
+
+        response = self.client.delete(
+            "/shelters/12345/service_shifts/abc123",
+            headers=self.headers,
+        )
+
+        data = json.loads(response.data.decode("utf-8"))
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(data["message"], "Failed to delete service shift")
+
 if __name__ == "__main__":
     unittest.main()
 # pylint: enable=line-too-long

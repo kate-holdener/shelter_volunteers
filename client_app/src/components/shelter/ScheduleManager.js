@@ -6,6 +6,7 @@ import { formatDate, displayTime } from "../../formatting/FormatDateTime";
 import { scheduleAPI } from "../../api/schedule";
 import { serviceShiftAPI } from "../../api/serviceShift";
 import Loading from "../Loading";
+import ServerError from "../ServerError";
 
 function ShelterScheduleManager() {
   const { shelterId } = useParams(); // Extract from URL param
@@ -13,6 +14,7 @@ function ShelterScheduleManager() {
   const [selectedDates, setSelectedDates] = useState([]);
   const [tentativeSchedule, setTentativeSchedule] = useState({});
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [openDates, setOpenDates] = useState([]);
   const [shiftTemplates, setShiftTemplates] = useState([]);
   const [submitMessage, setSubmitMessage] = useState({ type: "", text: "" });
@@ -20,22 +22,28 @@ function ShelterScheduleManager() {
   useEffect(() => {
     // Fetch existing shifts when the component mounts
     const fetchShifts = async () => {
-      const shifts = await scheduleAPI.getShifts(shelterId);
-      if (!shifts || shifts.length === 0) {
-        setNoSchedule(true);
-      } else {
-        setShiftTemplates(shifts);
-        const existingShifts = await serviceShiftAPI.getFutureShiftsForShelter(shelterId);
-        const openDatesSet = new Set(
-          existingShifts.map((shift) => {
-            const date = new Date(shift.shift_start);
-            date.setHours(0, 0, 0, 0);
-            return date.toISOString().split("T")[0];
-          }),
-        );
-        setOpenDates(openDatesSet);
+      try {
+        const shifts = await scheduleAPI.getShifts(shelterId);
+        if (!shifts || shifts.length === 0) {
+          setNoSchedule(true);
+        } else {
+          setShiftTemplates(shifts);
+          const existingShifts = await serviceShiftAPI.getFutureShiftsForShelter(shelterId);
+          const openDatesSet = new Set(
+            existingShifts.map((shift) => {
+              const date = new Date(shift.shift_start);
+              date.setHours(0, 0, 0, 0);
+              return date.toISOString().split("T")[0];
+            }),
+          );
+          setOpenDates(openDatesSet);
+        }
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching shifts:", error);
+        setError(true);
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
     fetchShifts();
   }, []);
@@ -190,6 +198,10 @@ function ShelterScheduleManager() {
 
   if (isLoading) {
     return <Loading />;
+  }
+
+  if (error) {
+    return <ServerError />;
   }
 
   if (noSchedule) {

@@ -7,6 +7,7 @@ import {
   millisToTimeString,
   timeStringToMillis,
 } from "../../formatting/FormatDateTime";
+import ServerError from "../ServerError";
 
 const RepeatableShiftsScreen = () => {
   const { shelterId } = useParams();
@@ -14,6 +15,7 @@ const RepeatableShiftsScreen = () => {
   const [shelterName, setShelterName] = useState("");
   const [loadingShelterName, setLoadingShelterName] = useState(false);
 
+  const [error, setError] = useState(false);
   const [errorMessages, setErrorMessages] = useState([]);
 
   const [pendingShifts, setPendingShifts] = useState([]);
@@ -26,6 +28,10 @@ const RepeatableShiftsScreen = () => {
     shelterAPI.getShelter(shelterId).then((shelter) => {
       setShelterName(shelter.name);
       setLoadingShelterName(false);
+    }).catch((e) => {
+      console.error("Error fetching shelter:", e);
+      setError(true);
+      setLoadingShelterName(false);
     });
     return () => setLoadingShelterName(false);
   }, [shelterId]);
@@ -36,6 +42,10 @@ const RepeatableShiftsScreen = () => {
     setLoadingShifts(true);
     repeatableShiftsApi.getRepeatableShifts(shelterId).then((shifts) => {
       setPendingShifts(shifts);
+      setLoadingShifts(false);
+    }).catch((e) => {
+      console.error("Error fetching repeatable shifts:", e);
+      setError(true);
       setLoadingShifts(false);
     });
     return () => setLoadingShifts(false);
@@ -98,6 +108,7 @@ const RepeatableShiftsScreen = () => {
   };
 
   return (
+    error ? <ServerError /> :
     <div className="d-flex flex-column align-items-center gap-2">
       <div>
         <h1 className="display-4">Repeatable Shifts</h1>

@@ -14,6 +14,7 @@ const VIEW_CALENDAR = 'calendar';
 
 function Commitments(){
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [results, setResults] = useState([]);
   const [shifts, setShifts] = useState([]);
   const [selectedShifts, setSelectedShifts] = useState(new Set());
@@ -28,6 +29,7 @@ function Commitments(){
         setLoading(false);
       } catch (error) {
         console.error("fetch error:", error);
+        setError("Failed to load your upcoming shifts. Please try again later.");
         setLoading(false);
       }
     };
@@ -71,6 +73,7 @@ function Commitments(){
     }
     catch (error) {
       console.error("Error cancelling shifts:", error);
+      setResultMessage({'text': 'Failed to cancel shifts. Please try again.', 'success': false});
     } 
   };
 
@@ -122,6 +125,10 @@ function Commitments(){
 
   if (loading) {
     return <Loading />;
+  }
+
+  if (error) {
+    return <div className="message error">{error}</div>;
   }
 
   const hasShifts = shifts.length > 0;

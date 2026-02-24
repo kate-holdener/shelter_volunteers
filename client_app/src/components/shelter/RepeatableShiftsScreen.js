@@ -26,6 +26,10 @@ const RepeatableShiftsScreen = () => {
     shelterAPI.getShelter(shelterId).then((shelter) => {
       setShelterName(shelter.name);
       setLoadingShelterName(false);
+    }).catch((error) => {
+      console.error("Error loading shelter name:", error);
+      setErrorMessages(["Failed to load shelter information. Please refresh the page and try again."]);
+      setLoadingShelterName(false);
     });
     return () => setLoadingShelterName(false);
   }, [shelterId]);
@@ -36,6 +40,10 @@ const RepeatableShiftsScreen = () => {
     setLoadingShifts(true);
     repeatableShiftsApi.getRepeatableShifts(shelterId).then((shifts) => {
       setPendingShifts(shifts);
+      setLoadingShifts(false);
+    }).catch((error) => {
+      console.error("Error loading repeatable shifts:", error);
+      setErrorMessages(["Failed to load repeatable shifts. Please try again later."]);
       setLoadingShifts(false);
     });
     return () => setLoadingShifts(false);

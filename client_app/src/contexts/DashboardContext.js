@@ -68,6 +68,7 @@ export const DashboardProvider = ({ children }) => {
         setLoadingDashboards(false);
       } catch (error) {
         console.error("Error fetching permissions:", error);
+        setLoadingDashboards(false);
       }
     };
     fetchPermissions();

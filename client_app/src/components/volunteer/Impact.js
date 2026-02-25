@@ -3,6 +3,8 @@ import { serviceCommitmentAPI } from "../../api/serviceCommitment";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClock, faSearch } from '@fortawesome/free-solid-svg-icons';
 import "../../styles/volunteer/Impact.css";
+import ServerError from "../ServerError";
+import OperationError from "../OperationError";
 
 const onlyCompleted = (s) => {
   if (!s?.shift_end || !s?.shift_start) return false;
@@ -27,6 +29,7 @@ const calculateUniqueShelters = (shifts) => {
 
 function Impact() {
   const [impactData, setImpactData] = useState({ totalHours: 0, sheltersServed: 0 });
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     serviceCommitmentAPI.getPastCommitments()
@@ -37,32 +40,41 @@ function Impact() {
           sheltersServed: calculateUniqueShelters(completed),
         });
       })
-      .catch((e) => console.error("Error fetching past shifts:", e));
+      .catch((e) => {
+        console.error("Error fetching past shifts:", e);
+        setError(e);
+      });
   }, []);
+
+  if (error?.isServerError) return <ServerError />;
 
   return (
     <div className="impact-container">
       <h1 className="impact-title">Your Impact</h1>
-      <div className="impact-metrics">
-        <div className="metric-card">
-          <div className="metric-icon">
-            <FontAwesomeIcon icon={faClock} />
+      {error ? (
+        <OperationError message={error.message} />
+      ) : (
+        <div className="impact-metrics">
+          <div className="metric-card">
+            <div className="metric-icon">
+              <FontAwesomeIcon icon={faClock} />
+            </div>
+            <div className="metric-content">
+              <h4 className="metric-label">Total hours served</h4>
+              <p className="metric-value">{impactData.totalHours}</p>
+            </div>
           </div>
-          <div className="metric-content">
-            <h4 className="metric-label">Total hours served</h4>
-            <p className="metric-value">{impactData.totalHours}</p>
+          <div className="metric-card">
+            <div className="metric-icon">
+              <FontAwesomeIcon icon={faSearch} />
+            </div>
+            <div className="metric-content">
+              <h4 className="metric-label">Shelters served</h4>
+              <p className="metric-value">{impactData.sheltersServed}</p>
+            </div>
           </div>
         </div>
-        <div className="metric-card">
-          <div className="metric-icon">
-            <FontAwesomeIcon icon={faSearch} />
-          </div>
-          <div className="metric-content">
-            <h4 className="metric-label">Shelters served</h4>
-            <p className="metric-value">{impactData.sheltersServed}</p>
-          </div>
-        </div>
-      </div>
+      )}
     </div>
   );
 }

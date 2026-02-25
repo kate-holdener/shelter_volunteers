@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { serviceShiftAPI } from "../../api/serviceShift";
+import ServerError from "../ServerError";
+import OperationError from "../OperationError";
 
 function getMassEmailSubject(shift) {
   const start = new Date(shift.shift_start);
@@ -11,12 +13,18 @@ function getMassEmailSubject(shift) {
 const ShiftUserInfoDisplay = ({ shift, onDismiss, isOpen }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [userInfos, setUserInfos] = useState([]);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     if (!shift || !shift._id) return;
     setIsLoading(true);
+    setError(false);
     serviceShiftAPI.getUserInfosInShift(shift._id).then((infos) => {
       setUserInfos(infos);
+      setIsLoading(false);
+    }).catch((e) => {
+      console.error("Error fetching user infos:", e);
+      setError(e);
       setIsLoading(false);
     });
   }, [shift]);
@@ -25,13 +33,14 @@ const ShiftUserInfoDisplay = ({ shift, onDismiss, isOpen }) => {
     return null;
   }
 
+  if (error?.isServerError) return <ServerError />;
+
   const massEmailBccEncoded = encodeURIComponent(userInfos.map((x) => x.email).join(","));
   const massEmailSubjectEncoded = encodeURIComponent(getMassEmailSubject(shift));
   const massEmailHref = `https://mail.google.com/mail/?view=cm&fs=1&bcc=${massEmailBccEncoded}&su=${massEmailSubjectEncoded}`;
 
   return (
-    isOpen &&
-    shift?._id !== null && (
+    isOpen && (
       <>
         <div className={"modal-overlay"} onClick={onDismiss}>
           <div
@@ -43,7 +52,7 @@ const ShiftUserInfoDisplay = ({ shift, onDismiss, isOpen }) => {
                 <p>
                   Volunteers: {shift.volunteers.length}/{shift.required_volunteer_count}
                 </p>
-                {!isLoading && (
+                {!isLoading && !error && (
                   <a
                     className="btn btn-info d-flex align-items-center"
                     href={massEmailHref}
@@ -56,7 +65,9 @@ const ShiftUserInfoDisplay = ({ shift, onDismiss, isOpen }) => {
                 )}
               </div>
             </div>
-            {isLoading ? (
+            {error ? (
+              <OperationError message={error.message} />
+            ) : isLoading ? (
               <p>Loading...</p>
             ) : (
               <table className={"table mx-6 my-2"}>

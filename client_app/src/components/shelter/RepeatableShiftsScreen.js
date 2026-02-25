@@ -7,6 +7,8 @@ import {
   millisToTimeString,
   timeStringToMillis,
 } from "../../formatting/FormatDateTime";
+import ServerError from "../ServerError";
+import OperationError from "../OperationError";
 
 const RepeatableShiftsScreen = () => {
   const { shelterId } = useParams();
@@ -14,7 +16,7 @@ const RepeatableShiftsScreen = () => {
   const [shelterName, setShelterName] = useState("");
   const [loadingShelterName, setLoadingShelterName] = useState(false);
 
-  const [errorMessages, setErrorMessages] = useState([]);
+  const [error, setError] = useState(false);
 
   const [pendingShifts, setPendingShifts] = useState([]);
   const [loadingShifts, setLoadingShifts] = useState(false);
@@ -25,6 +27,10 @@ const RepeatableShiftsScreen = () => {
     setLoadingShelterName(true);
     shelterAPI.getShelter(shelterId).then((shelter) => {
       setShelterName(shelter.name);
+      setLoadingShelterName(false);
+    }).catch((e) => {
+      console.error("Error fetching shelter:", e);
+      setError(e);
       setLoadingShelterName(false);
     });
     return () => setLoadingShelterName(false);
@@ -37,6 +43,10 @@ const RepeatableShiftsScreen = () => {
     repeatableShiftsApi.getRepeatableShifts(shelterId).then((shifts) => {
       setPendingShifts(shifts);
       setLoadingShifts(false);
+    }).catch((e) => {
+      console.error("Error fetching repeatable shifts:", e);
+      setError(e);
+      setLoadingShifts(false);
     });
     return () => setLoadingShifts(false);
   }, [shelterId]);
@@ -48,19 +58,10 @@ const RepeatableShiftsScreen = () => {
       .setRepeatableShifts(shelterId, pendingShifts)
       .then((shifts) => {
         setPendingShifts(shifts);
-        setErrorMessages([]);
+        setError(false);
       })
-      .catch((data) => {
-        const errors = ["Fix form errors and try again.", ...data.generic_errors];
-        Object.keys(data.keyed_errors).forEach((key) => {
-          const idx = Number.parseInt(key) + 1;
-          Object.keys(data.keyed_errors[key]).forEach((field) => {
-            for (let error of data.keyed_errors[key][field]) {
-              errors.push("Shift " + idx + ": " + error);
-            }
-          });
-        });
-        setErrorMessages(errors);
+      .catch((e) => {
+        setError(e);
       })
       .finally(() => {
         setLoadingShifts(false);
@@ -97,6 +98,8 @@ const RepeatableShiftsScreen = () => {
     setPendingShifts((shifts) => shifts.filter((_, i) => i !== index));
   };
 
+  if (error?.isServerError) return <ServerError />;
+
   return (
     <div className="d-flex flex-column align-items-center gap-2">
       <div>
@@ -105,13 +108,7 @@ const RepeatableShiftsScreen = () => {
           Shelter: {loadingShelterName ? "Loading Shelter Name" : shelterName} ({shelterId})
         </h2>
       </div>
-      {errorMessages.length > 0 && (
-        <ul className="w-100 text-danger bg-danger-subtle text-start">
-          {errorMessages.map((message, index) => (
-            <li key={index}>{message}</li>
-          ))}
-        </ul>
-      )}
+      {error && <OperationError message={error.message} />}
       <div className="card">
         <h1>Projected Repeatable Shifts</h1>
         {loadingShifts ? (

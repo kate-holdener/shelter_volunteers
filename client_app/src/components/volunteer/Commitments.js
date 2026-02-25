@@ -7,6 +7,8 @@ import { DesktopShiftRow } from './DesktopShiftRow';
 import { SubmitResultsMessage } from './SubmitResultsMessage';
 import VolunteerShiftCalendar from './VolunteerShiftCalendar';
 import Loading from '../Loading';
+import ServerError from '../ServerError';
+import OperationError from '../OperationError';
 import '../../styles/volunteer/CommitmentsViewToggle.css';
 
 const VIEW_LIST = 'list';
@@ -14,6 +16,7 @@ const VIEW_CALENDAR = 'calendar';
 
 function Commitments(){
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [results, setResults] = useState([]);
   const [shifts, setShifts] = useState([]);
   const [selectedShifts, setSelectedShifts] = useState(new Set());
@@ -28,6 +31,7 @@ function Commitments(){
         setLoading(false);
       } catch (error) {
         console.error("fetch error:", error);
+        setError(error);
         setLoading(false);
       }
     };
@@ -123,12 +127,14 @@ function Commitments(){
   if (loading) {
     return <Loading />;
   }
+  if (error?.isServerError) return <ServerError />;
 
   const hasShifts = shifts.length > 0;
 
   return (
     <div className="has-sticky-bottom">
       <h1 className="title-small">Your Upcoming Shifts</h1>
+      {error && <OperationError message={error.message} />}
       <SubmitResultsMessage
         resultMessage={resultMessage}
         closeModal={closeModal}

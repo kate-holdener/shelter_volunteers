@@ -9,10 +9,13 @@ import SignUpResults from './SignUpResults';
 import { MobileShiftCard } from './MobileShiftCard';
 import { DesktopShiftRow } from './DesktopShiftRow';
 import Loading from '../Loading';
+import ServerError from '../ServerError';
+import OperationError from '../OperationError';
 
 
 function VolunteerShiftSignup(){
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [results, setResults] = useState([]);
   const [resultShifts, setResultShifts] = useState([]);
@@ -35,6 +38,7 @@ function VolunteerShiftSignup(){
         setLoading(false);
       } catch (error) {
         console.error("fetch error:", error);
+        setError(error);
         setLoading(false);
       }
     };
@@ -219,9 +223,11 @@ function VolunteerShiftSignup(){
   if (loading) {
     return <Loading />;
   }
+  if (error?.isServerError) return <ServerError />;
   return (
     <div className="has-sticky-bottom">
       <h1 className="title-small">Volunteer Shift Sign-up</h1>
+      {error && <OperationError message={error.message} />}
       <div className="controls-section">
         {/* Sort Controls */}
         <div className="sort-section">

@@ -1,12 +1,17 @@
+import { useState } from "react";
 import { GoogleLogin } from '@react-oauth/google';
 import { loginAPI } from '../../api/login';
 import "../../styles/Login.css";
 import { jwtDecode } from "jwt-decode";
 import {useAuth } from "../../contexts/AuthContext";
+import ServerError from "../ServerError";
+import OperationError from "../OperationError";
 
 function Login() {
   const { login } = useAuth();
+  const [loginError, setLoginError] = useState(false);
   const onSuccess = (credentialResponse) => {
+    setLoginError(false);
     const decoded = jwtDecode(credentialResponse.credential);
     const user = {
       name: decoded.name || decoded.given_name || decoded.email,
@@ -19,12 +24,15 @@ function Login() {
       })
       .catch(error => {
         console.error('API Error:', error);
+        setLoginError(error);
       });
   };
     
     const onError = () => {
       console.log('Login Failed');
     };
+
+    if (loginError?.isServerError) return <ServerError />;
   
     return (
       <div className="home-container">
@@ -45,6 +53,9 @@ function Login() {
               size="large"
             />
           </div>
+          {loginError && !loginError.isServerError && (
+            <OperationError message={loginError.message} />
+          )}
           <p className="tagline-small">
             Sign in to get started with your personalized experience
           </p>

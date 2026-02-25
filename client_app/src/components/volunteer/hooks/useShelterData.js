@@ -6,6 +6,7 @@ export const useShelterData = () => {
   const [data, setData] = useState([]);
   const [originalData, setOriginalData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [noSearchDataAvailable, setNoSearchDataAvailable] = useState(false);
 
   useEffect(() => {
@@ -29,6 +30,7 @@ export const useShelterData = () => {
         setLoading(false);
       } catch (error) {
         console.error("fetch error:", error);
+        setError(error);
         setLoading(false);
       }
     };
@@ -41,6 +43,7 @@ export const useShelterData = () => {
     setData,
     originalData,
     loading,
+    error,
     setLoading,
     noSearchDataAvailable,
     setNoSearchDataAvailable,

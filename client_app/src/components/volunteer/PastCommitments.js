@@ -74,30 +74,30 @@ function PastCommitments() {
       <div className="description">
         <p className="tagline-small">Here are the shifts you have completed in the past.</p>
       </div>
-          {/* Desktop Table View */}
-          <div className="table-container desktop-only">
-            <table className="shifts-table">
-              <thead>
-                <tr className="table-header">
-                  <th>Shelter</th>
-                  <th>Date</th>
-                  <th>Time</th>
-                  <th>Duration</th>
-                </tr>
-              </thead>
-              <tbody>
-                {shifts.map((shift) => (
-                  <DesktopShiftRow key={shift._id} shiftData={processShiftData(shift)} />
-                ))}
-              </tbody>
-            </table>
-          </div>
-          {/* Mobile Card View */}
-          <div className="cards-container mobile-only">
+      {/* Desktop Table View */}
+      <div className="table-container desktop-only">
+        <table className="shifts-table">
+          <thead>
+            <tr className="table-header">
+              <th>Shelter</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Duration</th>
+            </tr>
+          </thead>
+          <tbody>
             {shifts.map((shift) => (
-              <MobileShiftCard key={shift._id} shiftData={processShiftData(shift)} />
+              <DesktopShiftRow key={shift._id} shiftData={processShiftData(shift)} />
             ))}
-          </div>
+          </tbody>
+        </table>
+      </div>
+      {/* Mobile Card View */}
+      <div className="cards-container mobile-only">
+        {shifts.map((shift) => (
+          <MobileShiftCard key={shift._id} shiftData={processShiftData(shift)} />
+        ))}
+      </div>
     </div>
   );
 }

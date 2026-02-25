@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { serviceCommitmentAPI } from "../../api/serviceCommitment";
+import { categorizeError } from "../../api/fetchClient";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClock, faSearch } from '@fortawesome/free-solid-svg-icons';
 import "../../styles/volunteer/Impact.css";
@@ -41,13 +42,12 @@ function Impact() {
       })
       .catch((e) => {
         console.error("Error fetching past shifts:", e);
-        setError(true);
+        setError(categorizeError(e));
       });
   }, []);
 
-  if (error) {
-    return <ServerError />;
-  }
+  if (error === true) return <ServerError />;
+  if (error) return <div className="message error">{error}</div>;
 
   return (
     <div className="impact-container">

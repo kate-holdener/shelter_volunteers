@@ -2,6 +2,7 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { shelterAPI } from "../../api/shelter";
 import { repeatableShiftsApi } from "../../api/repeatableShiftsApi";
+import { categorizeError } from "../../api/fetchClient";
 import {
   displayTime,
   millisToTimeString,
@@ -30,7 +31,7 @@ const RepeatableShiftsScreen = () => {
       setLoadingShelterName(false);
     }).catch((e) => {
       console.error("Error fetching shelter:", e);
-      setError(true);
+      setError(categorizeError(e));
       setLoadingShelterName(false);
     });
     return () => setLoadingShelterName(false);
@@ -45,7 +46,7 @@ const RepeatableShiftsScreen = () => {
       setLoadingShifts(false);
     }).catch((e) => {
       console.error("Error fetching repeatable shifts:", e);
-      setError(true);
+      setError(categorizeError(e));
       setLoadingShifts(false);
     });
     return () => setLoadingShifts(false);
@@ -107,8 +108,9 @@ const RepeatableShiftsScreen = () => {
     setPendingShifts((shifts) => shifts.filter((_, i) => i !== index));
   };
 
+  if (error === true) return <ServerError />;
+
   return (
-    error ? <ServerError /> :
     <div className="d-flex flex-column align-items-center gap-2">
       <div>
         <h1 className="display-4">Repeatable Shifts</h1>
@@ -116,6 +118,9 @@ const RepeatableShiftsScreen = () => {
           Shelter: {loadingShelterName ? "Loading Shelter Name" : shelterName} ({shelterId})
         </h2>
       </div>
+      {error && (
+        <div className="message error">{error}</div>
+      )}
       {errorMessages.length > 0 && (
         <ul className="w-100 text-danger bg-danger-subtle text-start">
           {errorMessages.map((message, index) => (

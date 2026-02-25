@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { serviceCommitmentAPI } from "../../api/serviceCommitment";
+import { categorizeError } from '../../api/fetchClient';
 import { formatDate } from "../../formatting/FormatDateTime";
 import { formatTime } from "../../formatting/FormatDateTime";
 import { MobileShiftCard } from "./MobileShiftCard";
@@ -34,7 +35,7 @@ function PastCommitments() {
         setShifts(sortedCommitments);
         setLoading(false);
       } catch (error) {
-        setError(true);
+        setError(categorizeError(error));
         setLoading(false);
       }
     };
@@ -65,9 +66,8 @@ function PastCommitments() {
   if (loading) {
     return <Loading />;
   }
-  if (error) {
-    return <ServerError />;
-  }
+  if (error === true) return <ServerError />;
+  if (error) return <div className="message error">{error}</div>;
   return (
     <div>
       <h1 className="title-small">Your Past Shifts</h1>

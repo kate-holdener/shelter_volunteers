@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from "react";
 import { Pencil, Save, X, Lock } from "lucide-react";
 import "../../styles/volunteer/Profile.css";
 import { getUserProfile, postUserProfile } from "../../api/volunteerApi";
+import { categorizeError } from "../../api/fetchClient";
 import ServerError from "../ServerError";
 
 const mockAuthUser = {
@@ -81,7 +82,7 @@ const ProfileSettings = () => {
     }).catch((e) => {
       if (cancelled) return;
       console.error("Error fetching profile:", e);
-      setError(true);
+      setError(categorizeError(e));
       setIsLoadingInitialData(false);
     });
 
@@ -203,8 +204,11 @@ const ProfileSettings = () => {
   const skillsExamples =
     "First aid/CPR, Narcan (naloxone), De-escalation/conflict resolution, Trauma-informed care, Mental health first aid";
 
-  if (error) {
+  if (error === true) {
     return <ServerError />;
+  }
+  if (error) {
+    return <div className="message error">{error}</div>;
   }
 
   return (

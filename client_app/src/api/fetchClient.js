@@ -59,7 +59,9 @@ export const fetchClient = async (endpoint, options = {}) => {
         const responseText = await response.text();
         if (responseText) errorMessage = responseText;
       }
-      throw new Error(errorMessage);
+      const error = new Error(errorMessage);
+      error.status = response.status;
+      throw error;
     }
 
     // Parse and return the response data
@@ -86,3 +88,11 @@ export const patchRequest = (
 ) => fetchClient(endpoint, { method: "PATCH", body: JSON.stringify(data) });
 
 export const deleteRequest = (endpoint) => fetchClient(endpoint, { method: "DELETE" });
+
+// Returns true for network/server errors (no response or 5xx), or an error message string for
+// 4xx operation failures. Components should show <ServerError /> when the return value is true,
+// and an inline error message when it is a string.
+export const categorizeError = (error, defaultMessage = 'An error occurred. Please try again.') =>
+  !error.status || error.status >= 500
+    ? true
+    : error.message || defaultMessage;

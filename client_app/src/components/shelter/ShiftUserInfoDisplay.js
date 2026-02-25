@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { serviceShiftAPI } from "../../api/serviceShift";
+import { categorizeError } from "../../api/fetchClient";
 import ServerError from "../ServerError";
 
 function getMassEmailSubject(shift) {
@@ -23,7 +24,7 @@ const ShiftUserInfoDisplay = ({ shift, onDismiss, isOpen }) => {
       setIsLoading(false);
     }).catch((e) => {
       console.error("Error fetching user infos:", e);
-      setError(true);
+      setError(categorizeError(e));
       setIsLoading(false);
     });
   }, [shift]);
@@ -32,7 +33,19 @@ const ShiftUserInfoDisplay = ({ shift, onDismiss, isOpen }) => {
     return null;
   }
 
-  if (error) return <ServerError />;
+  if (error === true) return <ServerError />;
+
+  if (error) {
+    return (
+      isOpen && (
+        <div className={"modal-overlay"} onClick={onDismiss}>
+          <div className={"modal-content d-flex flex-column align-items-center"}>
+            <p className="message error">{error}</p>
+          </div>
+        </div>
+      )
+    );
+  }
 
   const massEmailBccEncoded = encodeURIComponent(userInfos.map((x) => x.email).join(","));
   const massEmailSubjectEncoded = encodeURIComponent(getMassEmailSubject(shift));

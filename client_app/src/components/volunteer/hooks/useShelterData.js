@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { shelterAPI } from '../../../api/shelter';
 import { serviceShiftAPI } from '../../../api/serviceShift';
+import { categorizeError } from '../../../api/fetchClient';
 
 export const useShelterData = () => {
   const [data, setData] = useState([]);
@@ -30,7 +31,7 @@ export const useShelterData = () => {
         setLoading(false);
       } catch (error) {
         console.error("fetch error:", error);
-        setError(true);
+        setError(categorizeError(error));
         setLoading(false);
       }
     };

@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { shelterAPI } from '../../api/shelter';
 import { serviceShiftAPI } from '../../api/serviceShift';
 import { serviceCommitmentAPI } from '../../api/serviceCommitment';
+import { categorizeError } from '../../api/fetchClient';
 import { formatDate } from '../../formatting/FormatDateTime';
 import { formatTime } from '../../formatting/FormatDateTime';
 import { getUser } from '../../authentication/user';
@@ -37,7 +38,7 @@ function VolunteerShiftSignup(){
         setLoading(false);
       } catch (error) {
         console.error("fetch error:", error);
-        setError(true);
+        setError(categorizeError(error));
         setLoading(false);
       }
     };
@@ -222,9 +223,8 @@ function VolunteerShiftSignup(){
   if (loading) {
     return <Loading />;
   }
-  if (error) {
-    return <ServerError />;
-  }
+  if (error === true) return <ServerError />;
+  if (error) return <div className="message error">{error}</div>;
   return (
     <div className="has-sticky-bottom">
       <h1 className="title-small">Volunteer Shift Sign-up</h1>

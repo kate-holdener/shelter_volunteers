@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { serviceCommitmentAPI } from '../../api/serviceCommitment';
+import { categorizeError } from '../../api/fetchClient';
 import { formatDate } from '../../formatting/FormatDateTime';
 import { formatTime } from '../../formatting/FormatDateTime';
 import { MobileShiftCard } from './MobileShiftCard';
@@ -30,7 +31,7 @@ function Commitments(){
         setLoading(false);
       } catch (error) {
         console.error("fetch error:", error);
-        setError(true);
+        setError(categorizeError(error));
         setLoading(false);
       }
     };
@@ -126,9 +127,8 @@ function Commitments(){
   if (loading) {
     return <Loading />;
   }
-  if (error) {
-    return <ServerError />;
-  }
+  if (error === true) return <ServerError />;
+  if (error) return <div className="message error">{error}</div>;
 
   const hasShifts = shifts.length > 0;
 

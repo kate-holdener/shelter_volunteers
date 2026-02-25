@@ -5,6 +5,7 @@ import { DesktopShiftRow } from "./DesktopShiftRow";
 import { formatDate, displayTime } from "../../formatting/FormatDateTime";
 import { scheduleAPI } from "../../api/schedule";
 import { serviceShiftAPI } from "../../api/serviceShift";
+import { categorizeError } from "../../api/fetchClient";
 import Loading from "../Loading";
 import ServerError from "../ServerError";
 
@@ -41,7 +42,7 @@ function ShelterScheduleManager() {
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching shifts:", error);
-        setError(true);
+        setError(categorizeError(error));
         setIsLoading(false);
       }
     };
@@ -200,8 +201,12 @@ function ShelterScheduleManager() {
     return <Loading />;
   }
 
-  if (error) {
+  if (error === true) {
     return <ServerError />;
+  }
+
+  if (error) {
+    return <div className="message error">{error}</div>;
   }
 
   if (noSchedule) {

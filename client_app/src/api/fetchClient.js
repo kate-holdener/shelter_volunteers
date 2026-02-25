@@ -69,20 +69,3 @@ export const fetchClient = async (endpoint, options = {}) => {
     throw error;
   }
 };
-
-// ✅ Helper functions for common request types
-export const getRequest = (endpoint) => fetchClient(endpoint, { method: "GET" });
-
-export const postRequest = (endpoint, data) =>
-  fetchClient(endpoint, { method: "POST", body: JSON.stringify(data) });
-
-export const putRequest = (endpoint, data) =>
-  fetchClient(endpoint, { method: "PUT", body: JSON.stringify(data) });
-
-// Patch request MUST be exported to be used by the new feature
-export const patchRequest = (
-  endpoint,
-  data, // <-- EXPORT ADDED HERE
-) => fetchClient(endpoint, { method: "PATCH", body: JSON.stringify(data) });
-
-export const deleteRequest = (endpoint) => fetchClient(endpoint, { method: "DELETE" });

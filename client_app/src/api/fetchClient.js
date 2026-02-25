@@ -79,7 +79,7 @@ export const fetchClient = async (endpoint, options = {}) => {
     return await response.json();
   } catch (error) {
     console.log("Fetch error:", error.message);
-    if (error instanceof ApiError) {
+    if (error.isServerError !== undefined) {
       throw error;
     }
     throw new ApiError(error.message || 'Unable to connect to the server.', undefined);

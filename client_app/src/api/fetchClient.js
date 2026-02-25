@@ -71,17 +71,12 @@ export const fetchClient = async (endpoint, options = {}) => {
         const responseText = await response.text();
         if (responseText) errorMessage = responseText;
       }
-      const error = new ApiError(errorMessage, response.status);
-      throw error;
+      return Promise.reject(new ApiError(errorMessage, response.status));
     }
 
     // Parse and return the response data
     return await response.json();
   } catch (error) {
-    console.log("Fetch error:", error.message);
-    if (error.isServerError !== undefined) {
-      throw error;
-    }
     throw new ApiError(error.message || 'Unable to connect to the server.', undefined);
   }
 };

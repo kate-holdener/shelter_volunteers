@@ -33,14 +33,14 @@ const ShiftUserInfoDisplay = ({ shift, onDismiss, isOpen }) => {
     return null;
   }
 
-  if (error === true) return <ServerError />;
+  if (error?.isServerError) return <ServerError />;
 
   if (error) {
     return (
       isOpen && (
         <div className={"modal-overlay"} onClick={onDismiss}>
           <div className={"modal-content d-flex flex-column align-items-center"}>
-            <p className="message error">{error}</p>
+            <p className="message error">{error.message}</p>
           </div>
         </div>
       )

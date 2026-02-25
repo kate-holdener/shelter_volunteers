@@ -108,7 +108,7 @@ const RepeatableShiftsScreen = () => {
     setPendingShifts((shifts) => shifts.filter((_, i) => i !== index));
   };
 
-  if (error === true) return <ServerError />;
+  if (error?.isServerError) return <ServerError />;
 
   return (
     <div className="d-flex flex-column align-items-center gap-2">
@@ -119,7 +119,7 @@ const RepeatableShiftsScreen = () => {
         </h2>
       </div>
       {error && (
-        <div className="message error">{error}</div>
+        <div className="message error">{error.message}</div>
       )}
       {errorMessages.length > 0 && (
         <ul className="w-100 text-danger bg-danger-subtle text-start">

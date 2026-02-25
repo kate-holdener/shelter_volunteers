@@ -201,12 +201,12 @@ function ShelterScheduleManager() {
     return <Loading />;
   }
 
-  if (error === true) {
+  if (error?.isServerError) {
     return <ServerError />;
   }
 
   if (error) {
-    return <div className="message error">{error}</div>;
+    return <div className="message error">{error.message}</div>;
   }
 
   if (noSchedule) {

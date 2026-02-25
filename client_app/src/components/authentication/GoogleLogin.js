@@ -32,7 +32,7 @@ function Login() {
       console.log('Login Failed');
     };
 
-    if (loginError === true) return <ServerError />;
+    if (loginError?.isServerError) return <ServerError />;
   
     return (
       <div className="home-container">
@@ -53,8 +53,8 @@ function Login() {
               size="large"
             />
           </div>
-          {typeof loginError === 'string' && (
-            <p className="message error">{loginError}</p>
+          {loginError && !loginError.isServerError && (
+            <p className="message error">{loginError.message}</p>
           )}
           <p className="tagline-small">
             Sign in to get started with your personalized experience

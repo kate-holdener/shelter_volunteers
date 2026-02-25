@@ -127,8 +127,8 @@ function Commitments(){
   if (loading) {
     return <Loading />;
   }
-  if (error === true) return <ServerError />;
-  if (error) return <div className="message error">{error}</div>;
+  if (error?.isServerError) return <ServerError />;
+  if (error) return <div className="message error">{error.message}</div>;
 
   const hasShifts = shifts.length > 0;
 

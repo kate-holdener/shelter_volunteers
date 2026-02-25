@@ -89,10 +89,10 @@ export const patchRequest = (
 
 export const deleteRequest = (endpoint) => fetchClient(endpoint, { method: "DELETE" });
 
-// Returns true for network/server errors (no response or 5xx), or an error message string for
-// 4xx operation failures. Components should show <ServerError /> when the return value is true,
-// and an inline error message when it is a string.
-export const categorizeError = (error, defaultMessage = 'An error occurred. Please try again.') =>
-  !error.status || error.status >= 500
-    ? true
-    : error.message || defaultMessage;
+// Returns an object { isServerError: boolean, message: string } for consistent error handling.
+// When isServerError is true, the caller should show <ServerError /> (network/5xx failure).
+// When isServerError is false, the caller should show the message inline (4xx operation failure).
+export const categorizeError = (error, defaultMessage = 'An error occurred. Please try again.') => ({
+  isServerError: !error.status || error.status >= 500,
+  message: error.message || defaultMessage,
+});

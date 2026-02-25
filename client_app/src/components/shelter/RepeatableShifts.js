@@ -105,8 +105,8 @@ const RepeatableShifts = () => {
     setShifts(updatedShifts);
   };
 
-  if (error === true) return <ServerError />;
-  if (error) return <div className="message error">{error}</div>;
+  if (error?.isServerError) return <ServerError />;
+  if (error) return <div className="message error">{error.message}</div>;
 
   return (
     <div className="repeatable-shifts-page">

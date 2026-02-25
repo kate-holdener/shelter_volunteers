@@ -204,11 +204,11 @@ const ProfileSettings = () => {
   const skillsExamples =
     "First aid/CPR, Narcan (naloxone), De-escalation/conflict resolution, Trauma-informed care, Mental health first aid";
 
-  if (error === true) {
+  if (error?.isServerError) {
     return <ServerError />;
   }
   if (error) {
-    return <div className="message error">{error}</div>;
+    return <div className="message error">{error.message}</div>;
   }
 
   return (

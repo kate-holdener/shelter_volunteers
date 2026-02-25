@@ -6,6 +6,7 @@ import { MobileShiftCard } from "./MobileShiftCard";
 import { DesktopShiftRow } from "./DesktopShiftRow";
 import Loading from "../Loading";
 import ServerError from "../ServerError";
+import OperationError from "../OperationError";
 
 function compareDates(timestamp1, timestamp2) {
   const dateA = new Date(timestamp1).setHours(0, 0, 0, 0);
@@ -66,37 +67,42 @@ function PastCommitments() {
     return <Loading />;
   }
   if (error?.isServerError) return <ServerError />;
-  if (error) return <div className="message error">{error.message}</div>;
   return (
     <div>
       <h1 className="title-small">Your Past Shifts</h1>
-      <div className="description">
-        <p className="tagline-small">Here are the shifts you have completed in the past.</p>
-      </div>
-      {/* Desktop Table View */}
-      <div className="table-container desktop-only">
-        <table className="shifts-table">
-          <thead>
-            <tr className="table-header">
-              <th>Shelter</th>
-              <th>Date</th>
-              <th>Time</th>
-              <th>Duration</th>
-            </tr>
-          </thead>
-          <tbody>
+      {error ? (
+        <OperationError message={error.message} />
+      ) : (
+        <>
+          <div className="description">
+            <p className="tagline-small">Here are the shifts you have completed in the past.</p>
+          </div>
+          {/* Desktop Table View */}
+          <div className="table-container desktop-only">
+            <table className="shifts-table">
+              <thead>
+                <tr className="table-header">
+                  <th>Shelter</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Duration</th>
+                </tr>
+              </thead>
+              <tbody>
+                {shifts.map((shift) => (
+                  <DesktopShiftRow key={shift._id} shiftData={processShiftData(shift)} />
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {/* Mobile Card View */}
+          <div className="cards-container mobile-only">
             {shifts.map((shift) => (
-              <DesktopShiftRow key={shift._id} shiftData={processShiftData(shift)} />
+              <MobileShiftCard key={shift._id} shiftData={processShiftData(shift)} />
             ))}
-          </tbody>
-        </table>
-      </div>
-      {/* Mobile Card View */}
-      <div className="cards-container mobile-only">
-        {shifts.map((shift) => (
-          <MobileShiftCard key={shift._id} shiftData={processShiftData(shift)} />
-        ))}
-      </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

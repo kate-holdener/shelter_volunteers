@@ -7,6 +7,7 @@ import { scheduleAPI } from "../../api/schedule";
 import { serviceShiftAPI } from "../../api/serviceShift";
 import Loading from "../Loading";
 import ServerError from "../ServerError";
+import OperationError from "../OperationError";
 
 function ShelterScheduleManager() {
   const { shelterId } = useParams(); // Extract from URL param
@@ -204,10 +205,6 @@ function ShelterScheduleManager() {
     return <ServerError />;
   }
 
-  if (error) {
-    return <div className="message error">{error.message}</div>;
-  }
-
   if (noSchedule) {
     return (
       <div className="title-small">
@@ -223,6 +220,7 @@ function ShelterScheduleManager() {
     <div className="has-sticky-bottom">
       <h1 className="title-small">Select Dates To Open Shelter</h1>
       <div>
+        {error && <OperationError message={error.message} />}
         {submitMessage.text && (
           <div className={`message ${submitMessage.type}`}>{submitMessage.text}</div>
         )}

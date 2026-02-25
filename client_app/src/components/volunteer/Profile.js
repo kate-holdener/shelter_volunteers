@@ -3,6 +3,7 @@ import { Pencil, Save, X, Lock } from "lucide-react";
 import "../../styles/volunteer/Profile.css";
 import { getUserProfile, postUserProfile } from "../../api/volunteerApi";
 import ServerError from "../ServerError";
+import OperationError from "../OperationError";
 
 const mockAuthUser = {
   email: "volunteer.volunteer@gmail.com",
@@ -206,13 +207,11 @@ const ProfileSettings = () => {
   if (error?.isServerError) {
     return <ServerError />;
   }
-  if (error) {
-    return <div className="message error">{error.message}</div>;
-  }
 
   return (
     <div className="profile-container">
       <h1 className="profile-title">Contact Information</h1>
+      {error && <OperationError message={error.message} />}
       {/* Message Box for success/error alerts */}
       {message && (
         <div

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { serviceShiftAPI } from "../../api/serviceShift";
 import ServerError from "../ServerError";
+import OperationError from "../OperationError";
 
 function getMassEmailSubject(shift) {
   const start = new Date(shift.shift_start);
@@ -34,25 +35,12 @@ const ShiftUserInfoDisplay = ({ shift, onDismiss, isOpen }) => {
 
   if (error?.isServerError) return <ServerError />;
 
-  if (error) {
-    return (
-      isOpen && (
-        <div className={"modal-overlay"} onClick={onDismiss}>
-          <div className={"modal-content d-flex flex-column align-items-center"}>
-            <p className="message error">{error.message}</p>
-          </div>
-        </div>
-      )
-    );
-  }
-
   const massEmailBccEncoded = encodeURIComponent(userInfos.map((x) => x.email).join(","));
   const massEmailSubjectEncoded = encodeURIComponent(getMassEmailSubject(shift));
   const massEmailHref = `https://mail.google.com/mail/?view=cm&fs=1&bcc=${massEmailBccEncoded}&su=${massEmailSubjectEncoded}`;
 
   return (
-    isOpen &&
-    shift?._id !== null && (
+    isOpen && (
       <>
         <div className={"modal-overlay"} onClick={onDismiss}>
           <div
@@ -64,7 +52,7 @@ const ShiftUserInfoDisplay = ({ shift, onDismiss, isOpen }) => {
                 <p>
                   Volunteers: {shift.volunteers.length}/{shift.required_volunteer_count}
                 </p>
-                {!isLoading && (
+                {!isLoading && !error && (
                   <a
                     className="btn btn-info d-flex align-items-center"
                     href={massEmailHref}
@@ -77,7 +65,9 @@ const ShiftUserInfoDisplay = ({ shift, onDismiss, isOpen }) => {
                 )}
               </div>
             </div>
-            {isLoading ? (
+            {error ? (
+              <OperationError message={error.message} />
+            ) : isLoading ? (
               <p>Loading...</p>
             ) : (
               <table className={"table mx-6 my-2"}>

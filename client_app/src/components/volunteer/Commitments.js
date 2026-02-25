@@ -8,6 +8,7 @@ import { SubmitResultsMessage } from './SubmitResultsMessage';
 import VolunteerShiftCalendar from './VolunteerShiftCalendar';
 import Loading from '../Loading';
 import ServerError from '../ServerError';
+import OperationError from '../OperationError';
 import '../../styles/volunteer/CommitmentsViewToggle.css';
 
 const VIEW_LIST = 'list';
@@ -127,13 +128,13 @@ function Commitments(){
     return <Loading />;
   }
   if (error?.isServerError) return <ServerError />;
-  if (error) return <div className="message error">{error.message}</div>;
 
   const hasShifts = shifts.length > 0;
 
   return (
     <div className="has-sticky-bottom">
       <h1 className="title-small">Your Upcoming Shifts</h1>
+      {error && <OperationError message={error.message} />}
       <SubmitResultsMessage
         resultMessage={resultMessage}
         closeModal={closeModal}

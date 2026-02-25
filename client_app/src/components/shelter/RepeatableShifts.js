@@ -6,6 +6,7 @@ import { DesktopShiftRow } from "./DesktopShiftRow";
 import { timeStringToMillis } from "../../formatting/FormatDateTime";
 import { shelterAPI } from "../../api/shelter";
 import ServerError from "../ServerError";
+import OperationError from "../OperationError";
 const RepeatableShifts = () => {
   const { shelterId } = useParams(); // grab the shelterId from URL
 
@@ -105,11 +106,11 @@ const RepeatableShifts = () => {
   };
 
   if (error?.isServerError) return <ServerError />;
-  if (error) return <div className="message error">{error.message}</div>;
 
   return (
     <div className="repeatable-shifts-page">
       <h2>Define Repeatable Shifts for Shelter {shelterNameLabel}</h2>
+      {error && <OperationError message={error.message} />}
       <p className="instructions">
         Define the repeatable shifts below. Once you've added all your shifts, click "Submit
         Schedule" to save them.

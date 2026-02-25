@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClock, faSearch } from '@fortawesome/free-solid-svg-icons';
 import "../../styles/volunteer/Impact.css";
 import ServerError from "../ServerError";
+import OperationError from "../OperationError";
 
 const onlyCompleted = (s) => {
   if (!s?.shift_end || !s?.shift_start) return false;
@@ -46,31 +47,34 @@ function Impact() {
   }, []);
 
   if (error?.isServerError) return <ServerError />;
-  if (error) return <div className="message error">{error.message}</div>;
 
   return (
     <div className="impact-container">
       <h1 className="impact-title">Your Impact</h1>
-      <div className="impact-metrics">
-        <div className="metric-card">
-          <div className="metric-icon">
-            <FontAwesomeIcon icon={faClock} />
+      {error ? (
+        <OperationError message={error.message} />
+      ) : (
+        <div className="impact-metrics">
+          <div className="metric-card">
+            <div className="metric-icon">
+              <FontAwesomeIcon icon={faClock} />
+            </div>
+            <div className="metric-content">
+              <h4 className="metric-label">Total hours served</h4>
+              <p className="metric-value">{impactData.totalHours}</p>
+            </div>
           </div>
-          <div className="metric-content">
-            <h4 className="metric-label">Total hours served</h4>
-            <p className="metric-value">{impactData.totalHours}</p>
+          <div className="metric-card">
+            <div className="metric-icon">
+              <FontAwesomeIcon icon={faSearch} />
+            </div>
+            <div className="metric-content">
+              <h4 className="metric-label">Shelters served</h4>
+              <p className="metric-value">{impactData.sheltersServed}</p>
+            </div>
           </div>
         </div>
-        <div className="metric-card">
-          <div className="metric-icon">
-            <FontAwesomeIcon icon={faSearch} />
-          </div>
-          <div className="metric-content">
-            <h4 className="metric-label">Shelters served</h4>
-            <p className="metric-value">{impactData.sheltersServed}</p>
-          </div>
-        </div>
-      </div>
+      )}
     </div>
   );
 }

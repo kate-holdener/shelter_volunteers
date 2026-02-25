@@ -5,7 +5,6 @@ import { scheduleAPI } from "../../api/schedule";
 import { DesktopShiftRow } from "./DesktopShiftRow";
 import { timeStringToMillis } from "../../formatting/FormatDateTime";
 import { shelterAPI } from "../../api/shelter";
-import { categorizeError } from "../../api/fetchClient";
 import ServerError from "../ServerError";
 const RepeatableShifts = () => {
   const { shelterId } = useParams(); // grab the shelterId from URL
@@ -36,7 +35,7 @@ const RepeatableShifts = () => {
       setLoadingShelterInfo(false);
     }).catch((e) => {
       console.error("Error fetching shelter:", e);
-      setError(categorizeError(e));
+      setError(e);
       setLoadingShelterInfo(false);
     });
 

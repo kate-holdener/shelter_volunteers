@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { GoogleLogin } from '@react-oauth/google';
 import { loginAPI } from '../../api/login';
-import { categorizeError } from '../../api/fetchClient';
 import "../../styles/Login.css";
 import { jwtDecode } from "jwt-decode";
 import {useAuth } from "../../contexts/AuthContext";
@@ -24,7 +23,7 @@ function Login() {
       })
       .catch(error => {
         console.error('API Error:', error);
-        setLoginError(categorizeError(error, 'Login failed. Please try again.'));
+        setLoginError(error);
       });
   };
     

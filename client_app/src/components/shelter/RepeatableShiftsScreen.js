@@ -2,7 +2,6 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { shelterAPI } from "../../api/shelter";
 import { repeatableShiftsApi } from "../../api/repeatableShiftsApi";
-import { categorizeError } from "../../api/fetchClient";
 import {
   displayTime,
   millisToTimeString,
@@ -31,7 +30,7 @@ const RepeatableShiftsScreen = () => {
       setLoadingShelterName(false);
     }).catch((e) => {
       console.error("Error fetching shelter:", e);
-      setError(categorizeError(e));
+      setError(e);
       setLoadingShelterName(false);
     });
     return () => setLoadingShelterName(false);
@@ -46,7 +45,7 @@ const RepeatableShiftsScreen = () => {
       setLoadingShifts(false);
     }).catch((e) => {
       console.error("Error fetching repeatable shifts:", e);
-      setError(categorizeError(e));
+      setError(e);
       setLoadingShifts(false);
     });
     return () => setLoadingShifts(false);

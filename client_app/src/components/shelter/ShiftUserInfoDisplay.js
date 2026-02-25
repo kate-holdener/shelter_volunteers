@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { serviceShiftAPI } from "../../api/serviceShift";
-import { categorizeError } from "../../api/fetchClient";
 import ServerError from "../ServerError";
 
 function getMassEmailSubject(shift) {
@@ -24,7 +23,7 @@ const ShiftUserInfoDisplay = ({ shift, onDismiss, isOpen }) => {
       setIsLoading(false);
     }).catch((e) => {
       console.error("Error fetching user infos:", e);
-      setError(categorizeError(e));
+      setError(e);
       setIsLoading(false);
     });
   }, [shift]);

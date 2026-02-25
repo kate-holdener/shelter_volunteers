@@ -2,7 +2,6 @@ import React, { useState, useContext, useEffect } from "react";
 import { Pencil, Save, X, Lock } from "lucide-react";
 import "../../styles/volunteer/Profile.css";
 import { getUserProfile, postUserProfile } from "../../api/volunteerApi";
-import { categorizeError } from "../../api/fetchClient";
 import ServerError from "../ServerError";
 
 const mockAuthUser = {
@@ -82,7 +81,7 @@ const ProfileSettings = () => {
     }).catch((e) => {
       if (cancelled) return;
       console.error("Error fetching profile:", e);
-      setError(categorizeError(e));
+      setError(e);
       setIsLoadingInitialData(false);
     });
 

@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
 import { serviceCommitmentAPI } from '../../api/serviceCommitment';
-import { categorizeError } from '../../api/fetchClient';
 import { formatDate } from '../../formatting/FormatDateTime';
 import { formatTime } from '../../formatting/FormatDateTime';
 import { MobileShiftCard } from './MobileShiftCard';
@@ -31,7 +30,7 @@ function Commitments(){
         setLoading(false);
       } catch (error) {
         console.error("fetch error:", error);
-        setError(categorizeError(error));
+        setError(error);
         setLoading(false);
       }
     };

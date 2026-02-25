@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { serviceCommitmentAPI } from "../../api/serviceCommitment";
-import { categorizeError } from '../../api/fetchClient';
 import { formatDate } from "../../formatting/FormatDateTime";
 import { formatTime } from "../../formatting/FormatDateTime";
 import { MobileShiftCard } from "./MobileShiftCard";
@@ -35,7 +34,7 @@ function PastCommitments() {
         setShifts(sortedCommitments);
         setLoading(false);
       } catch (error) {
-        setError(categorizeError(error));
+        setError(error);
         setLoading(false);
       }
     };

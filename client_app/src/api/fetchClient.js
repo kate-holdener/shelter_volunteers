@@ -3,6 +3,18 @@ import { SERVER } from "../config";
 import { getToken } from "../authentication/getToken";
 import { getGlobalLogout } from "../contexts/AuthContext";
 
+// Custom error class thrown by fetchClient for all API failures.
+// isServerError is true for network failures and 5xx responses (show <ServerError />).
+// isServerError is false for 4xx responses (show error.message inline).
+export class ApiError extends Error {
+  constructor(message, status) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+    this.isServerError = !status || status >= 500;
+  }
+}
+
 // Create a navigation function that will be set by the App component
 let navigate = null;
 
@@ -59,8 +71,7 @@ export const fetchClient = async (endpoint, options = {}) => {
         const responseText = await response.text();
         if (responseText) errorMessage = responseText;
       }
-      const error = new Error(errorMessage);
-      error.status = response.status;
+      const error = new ApiError(errorMessage, response.status);
       throw error;
     }
 
@@ -68,7 +79,10 @@ export const fetchClient = async (endpoint, options = {}) => {
     return await response.json();
   } catch (error) {
     console.log("Fetch error:", error.message);
-    throw error;
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    throw new ApiError(error.message || 'Unable to connect to the server.', undefined);
   }
 };
 
@@ -88,11 +102,3 @@ export const patchRequest = (
 ) => fetchClient(endpoint, { method: "PATCH", body: JSON.stringify(data) });
 
 export const deleteRequest = (endpoint) => fetchClient(endpoint, { method: "DELETE" });
-
-// Returns an object { isServerError: boolean, message: string } for consistent error handling.
-// When isServerError is true, the caller should show <ServerError /> (network/5xx failure).
-// When isServerError is false, the caller should show the message inline (4xx operation failure).
-export const categorizeError = (error, defaultMessage = 'An error occurred. Please try again.') => ({
-  isServerError: !error.status || error.status >= 500,
-  message: error.message || defaultMessage,
-});

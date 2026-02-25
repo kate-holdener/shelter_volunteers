@@ -70,13 +70,10 @@ function PastCommitments() {
   return (
     <div>
       <h1 className="title-small">Your Past Shifts</h1>
-      {error ? (
-        <OperationError message={error.message} />
-      ) : (
-        <>
-          <div className="description">
-            <p className="tagline-small">Here are the shifts you have completed in the past.</p>
-          </div>
+      {error && <OperationError message={error.message} />}
+      <div className="description">
+        <p className="tagline-small">Here are the shifts you have completed in the past.</p>
+      </div>
           {/* Desktop Table View */}
           <div className="table-container desktop-only">
             <table className="shifts-table">
@@ -101,8 +98,6 @@ function PastCommitments() {
               <MobileShiftCard key={shift._id} shiftData={processShiftData(shift)} />
             ))}
           </div>
-        </>
-      )}
     </div>
   );
 }

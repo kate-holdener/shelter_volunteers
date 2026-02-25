@@ -10,6 +10,7 @@ import { MobileShiftCard } from './MobileShiftCard';
 import { DesktopShiftRow } from './DesktopShiftRow';
 import Loading from '../Loading';
 import ServerError from '../ServerError';
+import OperationError from '../OperationError';
 
 
 function VolunteerShiftSignup(){
@@ -223,10 +224,10 @@ function VolunteerShiftSignup(){
     return <Loading />;
   }
   if (error?.isServerError) return <ServerError />;
-  if (error) return <div className="message error">{error.message}</div>;
   return (
     <div className="has-sticky-bottom">
       <h1 className="title-small">Volunteer Shift Sign-up</h1>
+      {error && <OperationError message={error.message} />}
       <div className="controls-section">
         {/* Sort Controls */}
         <div className="sort-section">

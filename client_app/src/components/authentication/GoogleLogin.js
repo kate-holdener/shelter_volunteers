@@ -5,6 +5,7 @@ import "../../styles/Login.css";
 import { jwtDecode } from "jwt-decode";
 import {useAuth } from "../../contexts/AuthContext";
 import ServerError from "../ServerError";
+import OperationError from "../OperationError";
 
 function Login() {
   const { login } = useAuth();
@@ -53,7 +54,7 @@ function Login() {
             />
           </div>
           {loginError && !loginError.isServerError && (
-            <p className="message error">{loginError.message}</p>
+            <OperationError message={loginError.message} />
           )}
           <p className="tagline-small">
             Sign in to get started with your personalized experience

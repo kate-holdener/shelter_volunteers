@@ -8,6 +8,7 @@ import {
   timeStringToMillis,
 } from "../../formatting/FormatDateTime";
 import ServerError from "../ServerError";
+import OperationError from "../OperationError";
 
 const RepeatableShiftsScreen = () => {
   const { shelterId } = useParams();
@@ -16,7 +17,6 @@ const RepeatableShiftsScreen = () => {
   const [loadingShelterName, setLoadingShelterName] = useState(false);
 
   const [error, setError] = useState(false);
-  const [errorMessages, setErrorMessages] = useState([]);
 
   const [pendingShifts, setPendingShifts] = useState([]);
   const [loadingShifts, setLoadingShifts] = useState(false);
@@ -58,19 +58,10 @@ const RepeatableShiftsScreen = () => {
       .setRepeatableShifts(shelterId, pendingShifts)
       .then((shifts) => {
         setPendingShifts(shifts);
-        setErrorMessages([]);
+        setError(false);
       })
-      .catch((data) => {
-        const errors = ["Fix form errors and try again.", ...data.generic_errors];
-        Object.keys(data.keyed_errors).forEach((key) => {
-          const idx = Number.parseInt(key) + 1;
-          Object.keys(data.keyed_errors[key]).forEach((field) => {
-            for (let error of data.keyed_errors[key][field]) {
-              errors.push("Shift " + idx + ": " + error);
-            }
-          });
-        });
-        setErrorMessages(errors);
+      .catch((e) => {
+        setError(e);
       })
       .finally(() => {
         setLoadingShifts(false);
@@ -117,16 +108,7 @@ const RepeatableShiftsScreen = () => {
           Shelter: {loadingShelterName ? "Loading Shelter Name" : shelterName} ({shelterId})
         </h2>
       </div>
-      {error && (
-        <div className="message error">{error.message}</div>
-      )}
-      {errorMessages.length > 0 && (
-        <ul className="w-100 text-danger bg-danger-subtle text-start">
-          {errorMessages.map((message, index) => (
-            <li key={index}>{message}</li>
-          ))}
-        </ul>
-      )}
+      {error && <OperationError message={error.message} />}
       <div className="card">
         <h1>Projected Repeatable Shifts</h1>
         {loadingShifts ? (
